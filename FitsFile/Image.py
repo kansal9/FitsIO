@@ -17,8 +17,8 @@ class FitsImage(FitsHDU):
     def __init__(self, filename):
         super().__init__(filename)
 
-    def get_shape(self, hdu_index):
-        return self.hdulist[hdu_index].data.shape
+    def get_shape(self):
+        return self.hdulist[self.hdu_index].data.shape
 
     def read_image_value_type(self):
         hdu = self.hdulist[0]

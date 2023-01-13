@@ -14,10 +14,6 @@ __all__ = ['FitsBintable',]
 class FitsBintable(FitsHDU):
     def __init__(self, filename):
         super().__init__(filename)
-        self.hdu_index = 0
-
-    def set_hdu_index(self, index):
-        self.hdu_index = index
 
     def get_column_names(self):
         hdu = self.hdulist[self.hdu_index]
