@@ -9,6 +9,22 @@ If you would like to create a particular environment for this project, then yoi 
 Then you can install (Editable install as in development phase) project using command:
 '''pip3 install -e FitsIO/.'''
 
+## Install the package to use it for another project
+```python setup.py install```
+
+Usage:
+```
+from FitsIO.FitsFile import File
+import os
+
+#absolute file path
+
+filepath='/Users/kansal/Documents/GitHub/FitsIO/data/gal.fits'
+image = File.FitsFile(filepath)
+
+image.open()
+image.get_headers()
+```
 
 # Tutorial
 The tutorials are given in notebooks with associated documentation.
