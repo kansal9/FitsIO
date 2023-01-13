@@ -48,22 +48,28 @@ class FitsHDU(FitsFile):
         header[keyword] = (value, comment)
         self.hdulist.flush()
 
-    def update_keyword(self, keyword, value, comment=None):
-        hdu = self.hdulist[self.hdu_index]
-        header = hdu.header
-        header[keyword] = (value, comment)
-        self.hdulist.flush()
-
     def delete_keyword(self, keyword):
         hdu = self.hdulist[self.hdu_index]
         header = hdu.header
         del header[keyword]
         self.hdulist.flush()
 
+    def update_keyword_value(self, keyword, value):
+        header = self.hdulist[self.hdu_index].header
+        header[keyword] = value
+        self.hdulist.flush()
+
+    def update_keyword_name(self, old_keyword, new_keyword):
+        header = self.hdulist[self.hdu_index].header
+        header[new_keyword] = header[old_keyword]
+        header.comments[new_keyword] = header.comments[old_keyword]
+        del header[old_keyword]
+        self.hdulist.flush()
+
     def update_keyword_comment(self, keyword, comment):
         hdu = self.hdulist[self.hdu_index]
         header = hdu.header
-        header.setcomment(keyword, comment)
+        header.comments[keyword] = comment
         self.hdulist.flush()
 
     def write_history(self, history_entry):
@@ -95,27 +101,11 @@ class FitsHDU(FitsFile):
     def fits_type(self):
         hdu = self.hdulist[self.hdu_index]
         if isinstance(hdu, fits.ImageHDU):
-            print(f"HDU {hdu_index} of Fits file {self.filename} is IMAGE")
+            print(f"HDU {self.hdu_index} of Fits file {self.filename} is IMAGE")
         elif isinstance(hdu, fits.BinTableHDU):
-            print(f"HDU {hdu_index} of Fits file {self.filename} is BINTABLE")
+            print(f"HDU {self.hdu_index} of Fits file {self.filename} is BINTABLE")
         else:
             raise ValueError("HDU is not a binary table or an image")
-
-    def add_primary_hdu(self, data=None, header=None):
-        hdu = fits.PrimaryHDU(data=data, header=header)
-        self.hdulist.append(hdu)
-
-    def create_Image_hdu(self, data, header=None):
-        hdu = fits.ImageHDU(data=data, header=header)
-        self.hdulist.append(hdu)
-
-    def create_bintable_hdu(self, data, header=None, name=None):
-        cols = []
-        for i, col_name in enumerate(data.dtype.names):
-            col = fits.Column(name=col_name, format=data.dtype[i], array=data[col_name])
-            cols.append(col)
-        hdu = fits.BinTableHDU.from_columns(cols, header=header, name=name)
-        self.hdulist.append(hdu)
 
     def delete_hdu(self):
         self.hdulist.pop(self.hdu_index)
