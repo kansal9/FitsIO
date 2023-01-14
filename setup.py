@@ -30,6 +30,7 @@ setuptools.setup(
         'astropy>=5.1.1',
         'numpy>=1.23.4',
         'packaging>=21.3',
+        'skimage>=0.19.3',
       ],
       python_requires='>=3.9.5',
      )
