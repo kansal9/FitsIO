@@ -7,7 +7,7 @@ If you would like to create a particular environment for this project, then yoi 
 ```conda activate fitsenv```
 
 Then you can install (Editable install as in development phase) project using command:
-'''pip3 install -e FitsIO/.'''
+```pip3 install -e FitsIO/.```
 
 ## Install the package to use it for another project
 ```python setup.py install```
@@ -24,6 +24,22 @@ image = File.FitsFile(filepath)
 
 image.open()
 image.get_headers()
+```
+
+# Run Unit tests
+Go to the directory FitsIO and run:
+```
+python3 tests/FitsFile_Image.py
+```
+
+which will give you output given below:
+
+```
+.
+----------------------------------------------------------------------
+Ran 4 tests in 0.018s
+
+OK
 ```
 
 # Tutorial
