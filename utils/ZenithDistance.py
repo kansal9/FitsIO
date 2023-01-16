@@ -1,3 +1,5 @@
+#/usr/bin/env python3
+# coding: utf-8
 
 import numpy as np
 from astropy.coordinates import AltAz
@@ -7,7 +9,7 @@ import math
 class ZenithDistance:
     def __init__(self, header):
         self.header = header
-
+    """
     def get_zenith_distance(self):
         # Get the time and location information from the header
         time = Time(self.header['DATE-OBS'], format='isot')
@@ -26,7 +28,7 @@ class ZenithDistance:
         zenith_distance = coords.zen.degree
 
         return zenith_distance
-
+    """"
     def get_zenith_distance(self):
         airmass = self.header['AIRMASS']
         # Calculate the zenith distance using the airmass
