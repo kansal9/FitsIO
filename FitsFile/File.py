@@ -1,21 +1,15 @@
-#/usr/bin/env python3
+# /usr/bin/env python3
 # coding: utf-8
 
 import os
-import warnings
-
-import numpy as np
-import logging
-
 from astropy.io import fits
-from astropy import units, wcs
 
-
-__all__ = ['FitsFile',]
+__all__ = ['FitsFile']
 
 
 class FitsFile:
-    def __init__(self, filename, readmode='readonly'): #readmode = ‘readonly’, ‘update’, ‘append’, ‘denywrite’, or ‘ostream’
+    def __init__(self, filename, readmode='readonly'):
+        # readmode = ‘readonly’, ‘update’, ‘append’, ‘denywrite’, or ‘ostream’
         self.filename = filename
         self.mode = readmode
         self.hdulist = None
@@ -46,7 +40,7 @@ class FitsFile:
         return len(self.hdulist)
 
     def create_hdu(self):
-       self.hdulist = fits.HDUList()
+        self.hdulist = fits.HDUList()
 
     def add_primary_hdu(self, data=None, header=None):
         hdu = fits.PrimaryHDU(data=data, header=header)
@@ -77,7 +71,8 @@ class FitsFile:
     def close(self):
         if self.hdulist.fileinfo(0)['filemode'] in ('update', 'append'):
             self.hdulist.flush()
-            self.hdulist.close(output_verify='ignore') #disable the verification of the data written to the FITS file (can be time-consuming)
+            # disable the verification of the data written to the FITS file (can be time-consuming)
+            self.hdulist.close(output_verify='ignore')
         else:
             self.hdulist.close()
 

@@ -1,16 +1,10 @@
-#/usr/bin/env python3
+# /usr/bin/env python3
 # coding: utf-8
 
-import os
-import warnings
-
-import numpy as np
-
 from astropy.io import fits
+from File import *
 
-from .File import *
-
-__all__ = ['FitsHDU',]
+__all__ = ['FitsHDU']
 
 
 class FitsHDU(FitsFile):

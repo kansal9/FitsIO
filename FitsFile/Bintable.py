@@ -1,14 +1,10 @@
-#/usr/bin/env python3
+# /usr/bin/env python3
 # coding: utf-8
 
-import os
-import numpy as np
-
 from astropy.io import fits
+from Hdu import *
 
-from .Hdu import *
-
-__all__ = ['FitsBintable',]
+__all__ = ['FitsBintable']
 
 
 class FitsBintable(FitsHDU):
@@ -26,7 +22,7 @@ class FitsBintable(FitsHDU):
 
     def get_column_data(self, column_name):
         """Get a column from the specified HDU as a numpy array."""
-        hdu = self.hdulist[self.hdu_index ]
+        hdu = self.hdulist[self.hdu_index]
         if isinstance(hdu, fits.BinTableHDU):
             return hdu.data[column_name]
         else:
@@ -79,8 +75,8 @@ class FitsBintable(FitsHDU):
         else:
             raise ValueError("HDU is not a binary table.")
 
-    def add_column(self, name, format, array):
-        col = fits.Column(name=name, format=format, array=array)
+    def add_column(self, name, formt, array):
+        col = fits.Column(name=name, format=formt, array=array)
         self.hdulist[self.hdu_index].columns.add_col(col)
 
     def delete_column(self, name):
