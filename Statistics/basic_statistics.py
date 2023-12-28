@@ -77,5 +77,6 @@ class FitsStats(FitsHDU):
             return sorted_data[idx]
 
     def flux(self):
+        # ToDo: input reduced 2dfdr data file.. How?
         dec_val = self.header['MEANDEC']
         ra_val = self.header['MEANRA']

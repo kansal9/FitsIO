@@ -18,6 +18,14 @@ class FitsHDU(FitsFile):
     def get_hdu(self):
         return self.hdulist[self.hdu_index].header
 
+    def get_hdu_via_ext(self, extname):
+        ext_list = self. get_headers()
+        try:
+            idx = ext_list.index(extname)
+            return idx + 1
+        except ValueError:
+            return -1
+
     def list_keywords(self):
         hdu = self.hdulist[self.hdu_index]
         header = hdu.header

@@ -2,6 +2,7 @@
 # coding: utf-8
 
 from astropy.io import fits
+import numpy as np
 from Hdu import *
 
 __all__ = ['FitsBintable']
@@ -79,11 +80,77 @@ class FitsBintable(FitsHDU):
         col = fits.Column(name=name, format=formt, array=array)
         self.hdulist[self.hdu_index].columns.add_col(col)
 
+    def add_row(self, row):
+        hdu = self.hdulist[self.hdu_index]
+        if isinstance(hdu, fits.BinTableHDU):
+            if len(row) == len(hdu.columns):
+                new_row = np.array([tuple(row)], dtype=hdu.data.dtype)
+                new_data = np.concatenate([hdu.data, new_row])
+                new_hdu = fits.BinTableHDU(data=new_data, header=hdu.header)
+                self.hdulist[self.hdu_index] = new_hdu
+                self.hdulist.flush()
+            else:
+                raise ValueError("Number of values does not match the number of columns.")
+        else:
+            raise ValueError("HDU is not a binary table.")
+
+    def add_rows(self, rows):
+        hdu = self.hdulist[self.hdu_index]
+        if isinstance(hdu, fits.BinTableHDU):
+            if all(len(row) == len(hdu.columns) for row in rows):
+                new_rows = np.array([tuple(row) for row in rows], dtype=hdu.data.dtype)
+                new_data = np.concatenate([hdu.data, new_rows])
+                new_hdu = fits.BinTableHDU(data=new_data, header=hdu.header)
+                self.hdulist[self.hdu_index] = new_hdu
+                self.hdulist.flush()
+            else:
+                raise ValueError("Number of columns in 'rows' does not match the number of columns in the table.")
+        else:
+            raise ValueError("HDU is not a binary table.")
+
     def delete_column(self, name):
         self.hdulist[self.hdu_index].columns.del_col(name)
+
+    def delete_row(self, row_index):
+        hdu = self.hdulist[self.hdu_index]
+        if isinstance(hdu, fits.BinTableHDU):
+            num_rows = hdu.data.shape[0]
+            if 0 <= row_index < num_rows:
+                new_data = np.delete(hdu.data, row_index, axis=0)
+                new_hdu = fits.BinTableHDU(data=new_data, header=hdu.header)
+                # Replace the existing HDU with the new one
+                self.hdulist[self.hdu_index] = new_hdu
+                self.hdulist.flush()
+            else:
+                raise ValueError(f"Row index {row_index} is out of bounds for the table.")
+        else:
+            raise ValueError("HDU is not a binary table.")
 
     def write_column_segment(self, name, data, start, stop):
         self.hdulist[self.hdu_index].data[name][start:stop] = data
 
     def read_column_segment(self, name, start, stop):
         return self.hdulist[self.hdu_index].data[name][start:stop]
+
+    def sum_row(self, row_index):
+        hdu = self.hdulist[self.hdu_index]
+        if isinstance(hdu, fits.BinTableHDU):
+            num_rows = hdu.data.shape[0]
+            if 0 <= row_index < num_rows:
+                return np.sum(hdu.data[row_index])
+            else:
+                raise ValueError(f"Row index {row_index} is out of bounds for the table.")
+        else:
+            raise ValueError("HDU is not a binary table.")
+
+    def sum_col(self, column_name):
+        hdu = self.hdulist[self.hdu_index]
+        if isinstance(hdu, fits.BinTableHDU):
+            columns = hdu.columns
+            column_names = columns.names
+            if column_name in column_names:
+                return np.sum(hdu.data[column_name])
+            else:
+                raise ValueError(f"Column with name '{column_name}' not found in the table.")
+        else:
+            raise ValueError("HDU is not a binary table.")
