@@ -3,6 +3,8 @@
 
 import numpy as np
 from FitsFile.Hdu import *
+from astropy.convolution import convolve, Gaussian2DKernel
+from scipy.stats import skew, kurtosis
 
 
 class FitsStats(FitsHDU):
@@ -75,6 +77,54 @@ class FitsStats(FitsHDU):
             idx = int(cent * n / 100) - 1
             print(f"Centile {cent} %\t {sorted_data[idx]:.6f}")
             return sorted_data[idx]
+
+    def smoothing(self, kernel_size=3, smoothing=True):
+        """
+        Apply image smoothing or sharpening using convolution to a FITS image.
+        Parameters:
+        - kernel_size: Size of the convolution kernel (default: 3)
+        - smoothing: If True, apply smoothing; if False, apply sharpening (default: True)
+        Returns:
+        - Processed image
+        """
+        # Ensure the image is a numpy array
+        image = np.array(self.img_data)
+        # Define the convolution kernel for smoothing or sharpening
+        if smoothing:
+            sigma = kernel_size / 2
+            kernel = Gaussian2DKernel(x_stddev=sigma, y_stddev=sigma)
+        else:
+            kernel = np.array([[-1, -1, -1],
+                               [-1, 9, -1],
+                               [-1, -1, -1]], dtype=np.float32)
+
+        # Apply convolution to the image
+        processed_image = convolve(image, kernel, boundary='extend')
+        # Clip values to be within the valid intensity range
+        processed_image = np.clip(processed_image, 0, 65535)  # Assuming 16-bit FITS image
+        return processed_image
+
+    def skewness(self):
+        """
+        Calculate skewness of pixel values in a given image.
+        Parameters:
+        - image: 2D numpy array representing the image
+        Returns:
+        - Skewness value
+        """
+        flattened_image = self.img_data.flatten()
+        return skew(flattened_image)
+
+    def calculate_kurtosis(self):
+        """
+        Calculate kurtosis of pixel values in a given image.
+        Parameters:
+        - image: 2D numpy array representing the image
+        Returns:
+        - Kurtosis value
+        """
+        flattened_image = self.img_data.flatten()
+        return kurtosis(flattened_image)
 
     def flux(self):
         # ToDo: input reduced 2dfdr data file.. How?
