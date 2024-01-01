@@ -126,6 +126,27 @@ class FitsStats(FitsHDU):
         flattened_image = self.img_data.flatten()
         return kurtosis(flattened_image)
 
+    def radial_profile(self, center=None):
+        """
+            Calculate the radial profile of a 2D image.
+            Parameters:
+            - center (tuple): Coordinates (x, y) of the center around which to calculate the radial profile.
+              center = (image_size // 2, image_size // 2)
+            Returns:
+            - ndarray: Radial profile, representing the average intensity at each radial distance from the center.
+            """
+        y, x = np.indices(self.img_data.shape)
+        if center is None:
+            height = self.header['NAXIS1']
+            width = self.header['NAXIS2']
+            center = (width // 2, height // 2)
+        r = np.sqrt((x - center[0]) ** 2 + (y - center[1]) ** 2)
+        r = r.astype(int)
+        tbin = np.bincount(r.ravel(), self.img_data.ravel())
+        nr = np.bincount(r.ravel())
+        rprofile = tbin / nr
+        return rprofile
+
     def flux(self):
         # ToDo: input reduced 2dfdr data file.. How?
         dec_val = self.header['MEANDEC']
